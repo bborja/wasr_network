@@ -1,11 +1,13 @@
 # Water-obstacle Separation and Refinement network (WaSR)
 
 ## No-IMU Version 
-Architecture does not incorporate IMU information. The ARM and FFM modules are used to fuse encoder and decoder features.
+This architecture does not incorporate IMU information. The ARM and FFM modules are used to fuse encoder and decoder features.
 Novel water-separation loss is applied early in the encoder (res4 block) to force-separate water pixels from obstacle pixels.
 
 ### wasr_train_noimu.py
 Use this function to train the network.
+
+(to-do: explain parameters)
 
 ### wasr_inference_noimu_general.py
 This function can be used to perform inference on a single image. Example usage:
