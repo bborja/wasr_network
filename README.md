@@ -1,5 +1,12 @@
 # Water-obstacle Separation and Refinement network (WaSR)
 
+## Running in a Docker image with NVIDIA GPU support (requires Docker 19.03+)
+```
+docker build -t wasr .
+docker run -it --rm --gpus all -v $(pwd)/:/wasr wasr:latest bash
+python wasr_inference_noimu_general.py --img-path example_1.jpg
+```
+
 ## No-IMU Version 
 This architecture does not incorporate IMU information. The ARM and FFM modules are used to fuse encoder and decoder features.
 Novel water-separation loss is applied early in the encoder (res4 block) to force-separate water pixels from obstacle pixels.

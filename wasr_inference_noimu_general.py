@@ -74,7 +74,8 @@ def load(saver, sess, ckpt_path):
     print("Restored model parameters from {}".format(ckpt_path))
 
 def main():
-    os.environ['CUDA_VISIBLE_DEVICES'] = '1'
+    # uncomment/set to an invalid value to run on the CPU instead of the GPU
+    #os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 	
     """Create the model and start the evaluation process."""
     args = get_arguments()
@@ -91,7 +92,8 @@ def main():
     img -= IMG_MEAN
 
     # Expand first dimension
-    img = tf.expand_dims(img, dim=0)
+    #img = tf.expand_dims(img, dim=0) # tf 1.2
+    img = tf.expand_dims(img, axis=0)
 
     with tf.variable_scope('', reuse=False):
         net = wasr_NOIMU2({'data': img}, is_training=False, num_classes=args.num_classes)
@@ -104,8 +106,10 @@ def main():
 
 	# Upsample image to the original resolution
     raw_output = tf.image.resize_bilinear(raw_output, tf.shape(img)[1:3, ])
-    raw_output = tf.argmax(raw_output, dimension=3)
-    pred = tf.expand_dims(raw_output, dim=3)
+    #raw_output = tf.argmax(raw_output, dimension=3) # tf 1.2
+    #pred = tf.expand_dims(raw_output, dim=3) # tf 1.2
+    raw_output = tf.argmax(raw_output, axis=3)
+    pred = tf.expand_dims(raw_output, axis=3)
 
     # Set up TF session and initialize variables.
     config = tf.ConfigProto()
