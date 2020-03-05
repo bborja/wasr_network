@@ -79,7 +79,8 @@ class Network(object):
         assert len(args) != 0
         self.terminals = []
         for fed_layer in args:
-            if isinstance(fed_layer, basestring):
+            #if isinstance(fed_layer, basestring):  # py 2.7
+            if isinstance(fed_layer, str):
                 try:
                     #print('Layer ' + fed_layer + ' shape')
                     #print(self.layers[fed_layer].shape)
@@ -110,7 +111,8 @@ class Network(object):
 
     @layer
     def attention_refinment_module(self, input, name):
-        global_pool = tf.reduce_mean(input, [1, 2], keep_dims=True)
+        #global_pool = tf.reduce_mean(input, [1, 2], keep_dims=True) # tf 1.2
+        global_pool = tf.reduce_mean(input, [1, 2], keepdims=True)
         #conv_1 = keras_ly.Conv2D(2048, [1, 1], padding='SAME', name=name+'_conv1')(global_pool)
         conv_1 = keras_ly.Conv2D(input.get_shape()[3], [1, 1], padding='SAME', name=name+'_conv1')(global_pool)
         sigmoid = tf.sigmoid(conv_1, name=name+'_sigmoid')
@@ -120,7 +122,8 @@ class Network(object):
 
     @layer
     def attention_refinment_module_new(self, input, name, last_arm=False):
-        global_pool = tf.reduce_mean(input, [1, 2], keep_dims=True)
+        #global_pool = tf.reduce_mean(input, [1, 2], keep_dims=True) # tf 1.2
+        global_pool = tf.reduce_mean(input, [1, 2], keepdims=True)
         conv_1 = keras_ly.Conv2D(input.get_shape()[3], [1, 1], padding='SAME', name=name+'_conv1')(global_pool)
         with tf.variable_scope(name+'_conv1_bn') as scope:
             conv_1_bn = slim.batch_norm(conv_1, fused=True, scope=scope)
@@ -128,7 +131,8 @@ class Network(object):
         mul_out = tf.multiply(input, sigmoid, name=name+'_multiply')
 
         if last_arm:
-            glob_red = tf.reduce_mean(mul_out, [1, 2], keep_dims=True)
+            #glob_red = tf.reduce_mean(mul_out, [1, 2], keep_dims=True) # tf 1.2
+            glob_red = tf.reduce_mean(mul_out, [1, 2], keepdims=True)
             out_scale = tf.multiply(glob_red, mul_out)
             print('last arm shape')
             print(input.shape)
@@ -147,7 +151,8 @@ class Network(object):
         concat_1 = tf.concat(axis=3, values=[input_big, up_sampled_input], name=name+'_concat')
         conv_1 = keras_ly.Conv2D(1024, [3, 3], padding='SAME', name=name+'_conv1')(concat_1)
 
-        global_pool = tf.reduce_mean(conv_1, [1, 2], keep_dims=True)
+        #global_pool = tf.reduce_mean(conv_1, [1, 2], keep_dims=True) # tf 1.2
+        global_pool = tf.reduce_mean(conv_1, [1, 2], keepdims=True)
         conv_2 = keras_ly.Conv2D(1024, [1, 1], padding='SAME', name=name+'_conv2')(global_pool)
         conv_3 = keras_ly.Conv2D(1024, [1, 1], padding='SAME', name=name+'_conv3')(conv_2)
         sigmoid = tf.sigmoid(conv_3, name=name+'_sigmoid')
@@ -194,7 +199,8 @@ class Network(object):
 
     @layer
     def global_pool(self, input, name, axis):
-        return tf.reduce_mean(input, axis=axis, keep_dims=True, name=name)
+        #return tf.reduce_mean(input, axis=axis, keep_dims=True, name=name) # tf 1.2
+        return tf.reduce_mean(input, axis=axis, keepdims=True, name=name)
 
 
     @layer
@@ -221,7 +227,8 @@ class Network(object):
         # Convolution for a given input and kernel
         convolve = lambda i, k: tf.nn.conv2d(i, k, [1, s_h, s_w, 1], padding=padding)
         with tf.variable_scope(name) as scope:
-            kernel = self.make_var('weights', shape=[k_h, k_w, c_i / group, c_o])
+            #kernel = self.make_var('weights', shape=[k_h, k_w, c_i / group, c_o]) # tf 1.2
+            kernel = self.make_var('weights', shape=[k_h, k_w, c_i // group, c_o])
             if group == 1:
                 # This is the common-case. Convolve the input without any further complications.
                 output = convolve(input, kernel)
@@ -263,7 +270,9 @@ class Network(object):
         # Convolution for a given input and kernel
         convolve = lambda i, k: tf.nn.atrous_conv2d(i, k, dilation, padding=padding)
         with tf.variable_scope(name) as scope:
-            kernel = self.make_var('weights', shape=[k_h, k_w, c_i / group, c_o])
+            #kernel = self.make_var('weights', shape=[k_h, k_w, c_i / group, c_o]) # tf 1.2
+            kernel = self.make_var('weights', shape=[k_h, k_w, c_i // group, c_o])
+
             if group == 1:
                 # This is the common-case. Convolve the input without any further complications.
                 output = convolve(input, kernel)
@@ -411,4 +420,5 @@ class Network(object):
 			
     @layer
     def global_pool_layer(self, input, axis, name, keep_dims):
-        return tf.reduce_mean(input, axis, keep_dims=keep_dims, name=name)
+        #return tf.reduce_mean(input, axis, keep_dims=keep_dims, name=name) # tf 1.2
+        return tf.reduce_mean(input, axis, keepdims=keep_dims, name=name)
