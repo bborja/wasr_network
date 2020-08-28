@@ -1,5 +1,5 @@
 # WaSR - A water-obstacle separation and refinement network for unmanned surface vehicles
-https://arxiv.org/abs/2001.01921
+https://arxiv.org/abs/2001.01921 (ICRA 2020)
 
 <img align="right" src="figures/ICRA2020_network_model.png" width="50%" height="50%">
 
