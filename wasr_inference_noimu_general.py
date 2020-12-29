@@ -124,7 +124,10 @@ def main():
         os.makedirs(args.save_dir)
 
     # Read image
-    img_in = cv2.imread(os.path.join(args.dataset_path, args.img_path))
+    # img_in = cv2.imread(os.path.join(args.dataset_path, args.img_path))
+    img_in = cv2.imread(os.path.join(args.img_path))
+    assert img_in is not None
+    img_in = cv2.resize(img_in, (IMG_SIZE[1], IMG_SIZE[0]))
 
     # Run inference
     preds = sess.run(pred, feed_dict={img_input: img_in})
